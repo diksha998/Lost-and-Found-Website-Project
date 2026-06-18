@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found - Item Details</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='10' y1='10' x2='54' y2='54'%3E%3Cstop stop-color='%23667eea'/%3E%3Cstop offset='1' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ccircle cx='27' cy='27' r='14' fill='none' stroke='white' stroke-width='6'/%3E%3Cpath d='M38 38 50 50' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M23 23h9v9' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 900px;
+            margin: 8rem auto 2rem;
+            padding: 0 2rem;
+        }
+
+        /* Item Header */
+        .item-header {
+            background: white;
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 2rem;
+            right: 2.5rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-lost {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .status-found {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+        }
+
+        .item-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        .item-image-container {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            position: relative;
+        }
+
+        .item-image {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+        }
+
+        .item-icon {
+            font-size: 6rem;
+            color: #ccc;
+            opacity: 0.7;
+        }
+
+        /* Item Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            word-break: break-word;
+        }
+
+        /* Description */
+        .description-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .description-text {
+            line-height: 1.7;
+            color: #555;
+            white-space: pre-wrap;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 25px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .contact-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .contact-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(238, 90, 82, 0.35);
+        }
+
+        .owner-actions {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .owner-actions h3 {
+            margin-bottom: 0.75rem;
+            color: #333;
+        }
+
+        .owner-actions p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .message {
+            display: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            font-size: 1.5rem;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .main-container { padding: 6rem 1rem 2rem; }
+            .details-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; align-items: center; }
+            .item-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🔍 Lost & Found</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add-item.html">Add Item</a></li>
+                <li><a href="view-items.html">View Items</a></li>
+            </ul>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            Loading item details...
+        </div>
+
+        <div id="itemContent" style="display: none;">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+
+        <div id="pageMessage" class="message"></div>
+    </div>
+
+    <script>
+        // Auth check
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // User info
+        const userEmail = localStorage.getItem('userEmail') || 'User';
+        document.getElementById('userAvatar').textContent = userEmail.charAt(0).toUpperCase();
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userEmail');
+            window.location.href = 'login.html';
+        });
+
+        // Get item ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const itemId = parseInt(urlParams.get('id'));
+
+        // Load items
+        const allItems = JSON.parse(localStorage.getItem('lostFoundItems') || '[]');
+        const item = allItems.find(i => i.id === itemId);
+
+        if (!item) {
+            document.getElementById('loading').innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+                    <h2>Item not found</h2>
+                    <p>The item you're looking for doesn't exist or has been removed.</p>
+                    <a href="view-items.html" class="btn btn-primary" style="
+                        display: inline-block; margin-top: 1rem; padding: 1rem 2rem;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white; text-decoration: none; border-radius: 12px;
+                    ">← Back to Items</a>
+                </div>
+            `;
+            document.getElementById('itemContent').style.display = 'none';
+        } else {
+            // Hide loading and show content
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('itemContent').style.display = 'block';
+                renderItemDetails(item);
+            }, 1500);
+        }
+
+        function renderItemDetails(item) {
+            const statusClass = item.itemType === 'found' ? 'found' : 'lost';
+            const hasPhoto = item.image; // Check if photo exists
+            const icon = getCategoryIcon(item.category);
+            const isOwner = item.userEmail && item.userEmail === userEmail;
+
+            document.getElementById('itemContent').innerHTML = `
+                <div class="item-header">
+                    <div class="status-badge status-${statusClass}">
+                        ${item.itemType?.toUpperCase() || 'LOST'} ITEM
+                    </div>
+                    <h1 class="item-title">${item.itemName || 'Untitled Item'}</h1>
+                    
+                    <div class="item-image-container">
+                        ${hasPhoto ? 
+                            `<img src="${item.image}" alt="${item.itemName}" class="item-image">` : 
+                            `<div class="item-icon">${icon}</div>`
+                        }
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-label">Category</div>
+                            <div class="detail-value">${item.category || 'Other'}</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value">📍 ${item.location || 'Not specified'}</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">Date</div>
+                            <div class="detail-value">${formatDate(item.date || item.createdAt)}</div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-label">Reported</div>
+                            <div class="detail-value">${formatTimeAgo(item.createdAt)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                ${item.description ? `
+                    <div class="description-section">
+                        <h3 style="margin-bottom: 1.5rem; color: #333; font-size: 1.5rem;">Description</h3>
+                        <div class="description-text">${item.description}</div>
+                    </div>
+                ` : ''}
+
+                ${isOwner ? `
+                    <div class="owner-actions">
+                        <h3>Your Report</h3>
+                        <p>If this item has been found or returned, you can delete this report from the listing.</p>
+                        <button type="button" class="btn btn-danger" onclick="deleteOwnReport(${item.id})">
+                            Delete Report
+                        </button>
+                    </div>
+                ` : ''}
+
+                ${item.contactName ? `
+                    <div class="contact-section">
+                        <h2 class="contact-title">Contact Information</h2>
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <div class="contact-icon">👤</div>
+                                <div>${item.contactName}</div>
+                            </div>
+                            ${item.contactPhone ? `
+                                <div class="contact-item">
+                                    <div class="contact-icon">📞</div>
+                                    <div>${formatPhone(item.contactPhone)}</div>
+                                </div>
+                            ` : ''}
+                            ${item.contactEmail ? `
+                                <div class="contact-item">
+                                    <div class="contact-icon">✉️</div>
+                                    <div>${item.contactEmail}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="action-buttons">
+                            <a href="tel:${item.contactPhone || ''}" class="btn btn-primary">
+                                📞 Call Now
+                            </a>
+                            ${item.contactEmail ? `
+                                <a href="mailto:${item.contactEmail}" class="btn btn-secondary">
+                                    ✉️ Send Email
+                                </a>
+                            ` : ''}
+                            <a href="https://wa.me/91${item.contactPhone?.replace(/\D/g,'') || ''}" 
+                               class="btn btn-secondary" target="_blank">
+                                💬 WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="contact-section" style="background: #f8d7da; color: #721c24;">
+                        <h2 class="contact-title">No Contact Info</h2>
+                        <p style="font-size: 1.2rem; margin-bottom: 2rem;">Contact details not provided</p>
+                        <div class="action-buttons">
+                            <a href="view-items.html" class="btn btn-primary">← Back to List</a>
+                        </div>
+                    </div>
+                `}
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="view-items.html" class="btn btn-secondary" style="
+                        padding: 1rem 2rem; background: white; color: #666; 
+                        border: 2px solid #e1e5e9; text-decoration: none;
+                    ">
+                        ← Back to All Items
+                    </a>
+                </div>
+            `;
+        }
+
+        function deleteOwnReport(id) {
+            const items = JSON.parse(localStorage.getItem('lostFoundItems') || '[]');
+            const itemToDelete = items.find(i => i.id === id);
+
+            if (!itemToDelete) {
+                showPageMessage('This report was already removed.', false);
+                return;
+            }
+
+            if (!itemToDelete.userEmail || itemToDelete.userEmail !== userEmail) {
+                showPageMessage('Only the user who created this report can delete it.', false);
+                return;
+            }
+
+            const confirmed = confirm('Delete this report? Use this only after the item is found or returned.');
+            if (!confirmed) return;
+
+            const updatedItems = items.filter(i => i.id !== id);
+            localStorage.setItem('lostFoundItems', JSON.stringify(updatedItems));
+            showPageMessage('Report deleted successfully.', true);
+
+            setTimeout(() => {
+                window.location.href = 'view-items.html';
+            }, 1200);
+        }
+
+        function showPageMessage(text, isSuccess = true) {
+            const message = document.getElementById('pageMessage');
+            message.classList.remove('success', 'error');
+            message.classList.add(isSuccess ? 'success' : 'error');
+            message.textContent = text;
+            message.style.display = 'block';
+            message.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Electronics': '📱', 'Bags': '🎒', 'Clothing': '👕',
+                'Accessories': '💼', 'Keys': '🔑', 'Documents': '📄', 'Other': '📦'
+            };
+            return icons[category] || '📦';
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatTimeAgo(dateStr) {
+            const now = new Date();
+            const date = new Date(dateStr);
+            const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (diff === 0) return 'Today';
+            if (diff === 1) return 'Yesterday';
+            if (diff < 7) return `${diff} days ago`;
+            return date.toLocaleDateString();
+        }
+
+        function formatPhone(phone) {
+            // Simple phone formatting
+            return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Print functionality
+        window.print = () => {
+            window.print();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found - View Items</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='10' y1='10' x2='54' y2='54'%3E%3Cstop stop-color='%23667eea'/%3E%3Cstop offset='1' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ccircle cx='27' cy='27' r='14' fill='none' stroke='white' stroke-width='6'/%3E%3Cpath d='M38 38 50 50' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M23 23h9v9' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 8rem auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        /* Filters & Search */
+        .filters-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1.2rem 1rem 3rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 3rem;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Items Grid */
+        .items-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .item-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            border: 1px solid #f0f0f0;
+        }
+
+        .item-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .item-image {
+            height: 220px;
+            background: linear-gradient(45deg, #f0f2f5, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #ccc;
+            position: relative;
+        }
+
+        .item-image.has-photo {
+            background-size: cover;
+            background-position: center;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-lost {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .status-found {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+        }
+
+        .item-content {
+            padding: 1.8rem;
+        }
+
+        .item-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .item-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .meta-tag {
+            background: #f8f9fa;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .contact-info {
+            background: #f8f9ff;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            opacity: 0.5;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .page-btn {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .items-grid { grid-template-columns: 1fr; }
+            .main-container { padding: 6rem 1rem 2rem; }
+        }
+
+        /* Loading */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🔍 Lost & Found</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add-item.html">Add Item</a></li>
+                <li><a href="view-items.html" class="active">View Items</a></li>
+            </ul>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">All Items</h1>
+            <p>Browse lost and found items reported by the community</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search items...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="lost">Lost</button>
+                <button class="filter-btn" data-filter="found">Found</button>
+                <button class="filter-btn" data-filter="Electronics">Electronics</button>
+                <button class="filter-btn" data-filter="Bags">Bags</button>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="lostCount">0</div>
+                <div class="stat-label">Lost Items</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="foundCount">0</div>
+                <div class="stat-label">Found Items</div>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <div class="items-grid" id="itemsGrid">
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">📦</div>
+                    <h3>No items found</h3>
+                    <p>Try adjusting your search or filters</p>
+                    <a href="add-item.html" class="btn btn-primary" style="
+                        display: inline-block; margin-top: 1rem; padding: 1rem 2rem;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white; text-decoration: none; border-radius: 12px;
+                    ">Report First Item</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+        // Auth check
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // User info
+        const userEmail = localStorage.getItem('userEmail') || 'User';
+        document.getElementById('userAvatar').textContent = userEmail.charAt(0).toUpperCase();
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userEmail');
+            window.location.href = 'login.html';
+        });
+
+        let allItems = [];
+        let filteredItems = [];
+        let currentPage = 1;
+        const itemsPerPage = 12;
+
+        // Load items from localStorage
+        function loadItems() {
+            allItems = JSON.parse(localStorage.getItem('lostFoundItems') || '[]');
+            filteredItems = [...allItems];
+            renderItems();
+            updateStats();
+        }
+
+        // Render items
+        function renderItems() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredItems.slice(start, end);
+
+            const container = document.getElementById('itemsGrid');
+
+            if (pageItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">📦</div>
+                        <h3>No items found</h3>
+                        <p>Try adjusting your search or filters</p>
+                        <a href="add-item.html" class="btn btn-primary" style="
+                            display: inline-block; margin-top: 1rem; padding: 1rem 2rem;
+                            background: linear-gradient(135deg, #667eea, #764ba2);
+                            color: white; text-decoration: none; border-radius: 12px;
+                        ">Report First Item</a>
+                    </div>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = pageItems.map(item => createItemCard(item)).join('');
+
+            renderPagination();
+        }
+
+        function createItemCard(item) {
+            const hasPhoto = item.image; // Assuming image data stored
+            const icon = getCategoryIcon(item.category);
+            const statusClass = item.itemType === 'found' ? 'found' : 'lost';
+            
+            return `
+                <div class="item-card" onclick="viewItem(${item.id})">
+                    <div class="item-image ${hasPhoto ? 'has-photo' : ''}" 
+                         style="${hasPhoto ? `background-image: url(${item.image})` : ''}">
+                        ${hasPhoto ? '' : icon}
+                        <div class="status-badge status-${statusClass}">
+                            ${item.itemType?.toUpperCase() || 'LOST'}
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-title">${item.itemName || 'Untitled'}</h3>
+                        <div class="item-meta">
+                            <span class="meta-tag">📍 ${item.location || 'Unknown'}</span>
+                            <span class="meta-tag">${formatDate(item.date || item.createdAt)}</span>
+                        </div>
+                        <div class="item-meta">
+                            <span class="meta-tag">${item.category || 'Other'}</span>
+                        </div>
+                        ${item.contactName ? `
+                            <div class="contact-info">
+                                <div class="contact-name">${item.contactName}</div>
+                                <div>📞 ${item.contactPhone || 'No phone'}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Electronics': '📱', 'Bags': '🎒', 'Clothing': '👕',
+                'Accessories': '💼', 'Keys': '🔑', 'Documents': '📄', 'Other': '📦'
+            };
+            return icons[category] || '📦';
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (diff === 0) return 'Today';
+            if (diff === 1) return 'Yesterday';
+            return `${diff}d ago`;
+        }
+
+        // Search & Filter
+        document.getElementById('searchInput').addEventListener('input', debounce(filterItems, 300));
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterItems();
+            });
+        });
+
+        function filterItems() {
+            const searchTerm = normalizeText(document.getElementById('searchInput').value);
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+            filteredItems = allItems.filter(item => {
+                const searchableText = [
+                    item.itemName,
+                    item.location,
+                    item.category,
+                    item.description,
+                    item.itemType,
+                    item.contactName,
+                    item.contactPhone,
+                    item.contactEmail
+                ].map(normalizeText).join(' ');
+
+                const matchesSearch = !searchTerm || searchableText.includes(searchTerm);
+
+                const matchesFilter = activeFilter === 'all' || 
+                    item.itemType === activeFilter ||
+                    item.category === activeFilter;
+
+                return matchesSearch && matchesFilter;
+            });
+
+            currentPage = 1;
+            renderItems();
+        }
+
+        function normalizeText(value) {
+            return String(value || '').trim().toLowerCase();
+        }
+
+        // Stats
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allItems.length;
+            document.getElementById('lostCount').textContent = allItems.filter(i => i.itemType === 'lost').length;
+            document.getElementById('foundCount').textContent = allItems.filter(i => i.itemType === 'found').length;
+        }
+
+        // Pagination
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let pages = '';
+            const maxVisible = 5;
+            const startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (startPage > 1) {
+                pages += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) pages += `<span>...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pages += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) pages += `<span>...</span>`;
+                pages += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            pagination.innerHTML = pages;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderItems();
+        }
+
+        // View item details
+        function viewItem(id) {
+            window.location.href = `item-details.html?id=${id}`;
+        }
+
+        // Debounce utility
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadItems();
+            document.querySelector('.nav-links a[href="view-items.html"]').classList.add('active');
+        });
+
+        // Listen for storage changes (from add-item)
+        window.addEventListener('storage', loadItems);
+    </script>
+</body>
+</html>

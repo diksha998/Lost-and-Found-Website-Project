@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found - Home</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='10' y1='10' x2='54' y2='54'%3E%3Cstop stop-color='%23667eea'/%3E%3Cstop offset='1' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ccircle cx='27' cy='27' r='14' fill='none' stroke='white' stroke-width='6'/%3E%3Cpath d='M38 38 50 50' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M23 23h9v9' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 2rem;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 96px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(21, 87, 36, 0.18);
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            z-index: 1100;
+            display: none;
+            min-width: min(90vw, 360px);
+            text-align: center;
+        }
+
+        .success-toast.show {
+            display: block;
+            animation: slideToast 0.35s ease-out;
+        }
+
+        @keyframes slideToast {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -16px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: left 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .action-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .action-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        /* Recent Items */
+        .recent-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .see-all {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .see-all:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .item-card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .item-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .item-image {
+            height: 200px;
+            background: linear-gradient(45deg, #f0f2f5, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #ccc;
+        }
+
+        .item-content {
+            padding: 1.5rem;
+        }
+
+        .item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .status-found {
+            background: #d4edda;
+            color: #155724;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-lost {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .main-container {
+                padding: 6rem 1rem 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Footer */
+        .site-footer {
+            background: #1f2937;
+            color: #f8fafc;
+            margin-top: 4rem;
+            padding: 3.5rem 2rem 1.5rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr repeat(3, 1fr);
+            gap: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+
+        .footer-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+            color: #cbd5e1;
+            line-height: 1.7;
+            max-width: 360px;
+        }
+
+        .footer-section h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .footer-links a,
+        .footer-contact a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover,
+        .footer-contact a:hover {
+            color: white;
+        }
+
+        .footer-contact {
+            display: grid;
+            gap: 0.75rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+        }
+
+        .footer-bottom-links a:hover {
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .site-footer {
+                padding: 3rem 1rem 1.5rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-toast" id="successToast">Registered successfully!</div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🔍 Lost & Found</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add-item.html">Add Item</a></li>
+                <li><a href="view-items.html">View Items</a></li>
+            </ul>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero">
+                <h1>Welcome Back!</h1>
+                <p>Help reunite lost items with their owners or report found items in your community. Together, we can make a difference!</p>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-number" id="totalItems">247</div>
+                <div>Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number" id="foundItems">156</div>
+                <div>Found & Returned</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="activeUsers">892</div>
+                <div>Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-number" id="successRate">89%</div>
+                <div>Success Rate</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card" onclick="window.location.href='add-item.html'">
+                <div class="action-icon">➕</div>
+                <h3>Report Lost Item</h3>
+                <p>Found something that doesn't belong to you? Help return it to its owner.</p>
+            </div>
+            <div class="action-card" onclick="window.location.href='add-item.html'">
+                <div class="action-icon">🔍</div>
+                <h3>Search Lost Items</h3>
+                <p>Lost something valuable? Search our database to see if it's been found.</p>
+            </div>
+            <div class="action-card" onclick="window.location.href='view-items.html'">
+                <div class="action-icon">📋</div>
+                <h3>View All Items</h3>
+                <p>Browse all reported lost and found items in your area.</p>
+            </div>
+        </div>
+
+        <!-- Recent Items -->
+        <div class="recent-section">
+            <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+                <a href="view-items.html" class="see-all">See All →</a>
+            </div>
+            <div class="items-grid" id="recentItems">
+                <!-- Items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <div class="footer-brand">🔍 Lost &amp; Found</div>
+                    <p>Helping people report, search, and recover lost belongings through a simple community platform.</p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Platform</h3>
+                    <ul class="footer-links">
+                        <li><a href="add-item.html">Report Item</a></li>
+                        <li><a href="view-items.html">View Items</a></li>
+                        <li><a href="view-items.html">Search Items</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Claim Process</a></li>
+                        <li><a href="#">Safety Tips</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <div class="footer-contact">
+                        <a href="mailto:support@lostfound.com">support@lostfound.com</a>
+                        <span>24/7 community support</span>
+                        <span>Campus and local area coverage</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span>&copy; 2026 Lost &amp; Found. All rights reserved.</span>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Check authentication
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // Update user info
+        const userEmail = localStorage.getItem('userEmail') || 'User';
+        const userInitial = userEmail.charAt(0).toUpperCase();
+        document.getElementById('userAvatar').textContent = userInitial;
+
+        function showSuccessToast(message) {
+            const toast = document.getElementById('successToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userEmail');
+            window.location.href = 'login.html';
+        });
+
+        // Sample recent items data
+        const recentItems = [
+            {
+                id: 1,
+                title: "Black AirPods Pro Case",
+                category: "Electronics",
+                status: "found",
+                date: "2 hours ago",
+                location: "Campus Library"
+            },
+            {
+                id: 2,
+                title: "Blue Nike Backpack",
+                category: "Bags",
+                status: "lost",
+                date: "5 hours ago",
+                location: "Student Union"
+            },
+            {
+                id: 3,
+                title: "Silver iPhone 14",
+                category: "Electronics",
+                status: "found",
+                date: "1 day ago",
+                location: "Cafeteria"
+            },
+            {
+                id: 4,
+                title: "Black Wallet",
+                category: "Accessories",
+                status: "lost",
+                date: "2 days ago",
+                location: "Gym"
+            },
+            {
+                id: 5,
+                title: "Red Hoodie Jacket",
+                category: "Clothing",
+                status: "found",
+                date: "3 days ago",
+                location: "Parking Lot"
+            },
+            {
+                id: 6,
+                title: "Laptop Charger",
+                category: "Electronics",
+                status: "lost",
+                date: "4 days ago",
+                location: "Lecture Hall"
+            }
+        ];
+
+        // Load recent items
+        function loadRecentItems() {
+            const container = document.getElementById('recentItems');
+            container.innerHTML = '';
+
+            recentItems.slice(0, 6).forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+                itemCard.onclick = () => window.location.href = `item-details.html?id=${item.id}`;
+                
+                itemCard.innerHTML = `
+                    <div class="item-image">${getCategoryIcon(item.category)}</div>
+                    <div class="item-content">
+                        <h3 class="item-title">${item.title}</h3>
+                        <div class="item-meta">
+                            <span>📍 ${item.location}</span>
+                            <span>🕒 ${item.date}</span>
+                        </div>
+                        <div class="item-meta">
+                            <span>📱 ${item.category}</span>
+                            <span class="status-${item.status === 'found' ? 'found' : 'lost'}">${item.status.toUpperCase()}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(itemCard);
+            });
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Electronics': '📱',
+                'Bags': '🎒',
+                'Clothing': '👕',
+                'Accessories': '💼',
+                'Keys': '🔑',
+                'Documents': '📄'
+            };
+            return icons[category] || '📦';
+        }
+
+        // Update stats periodically (demo)
+        function updateStats() {
+            const stats = {
+                totalItems: 247 + Math.floor(Math.random() * 5),
+                foundItems: 156 + Math.floor(Math.random() * 3),
+                activeUsers: 892 + Math.floor(Math.random() * 10)
+            };
+            
+            document.getElementById('totalItems').textContent = stats.totalItems;
+            document.getElementById('foundItems').textContent = stats.foundItems;
+            document.getElementById('activeUsers').textContent = stats.activeUsers;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('registrationSuccess') === 'true') {
+                localStorage.removeItem('registrationSuccess');
+                showSuccessToast('Registered successfully!');
+            }
+
+            loadRecentItems();
+            updateStats();
+            
+            // Update stats every 30 seconds
+            setInterval(updateStats, 30000);
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                    navbar.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.15)';
+                } else {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                    navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+                }
+            });
+        });
+
+        // Prevent going back to login with browser back button
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            window.history.go(1);
+        };
+    </script>
+</body>
+</html>
